@@ -1,6 +1,0 @@
-# header
-#
-#= require "a"
-#= require "b"
-
-A = {}
