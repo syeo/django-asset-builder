@@ -1,2 +1,2 @@
-django-asset-builder
+django-staticfiles-redesigned
 ====================
