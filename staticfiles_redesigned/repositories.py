@@ -6,10 +6,9 @@ from staticfiles_redesigned.models.assets import AssetLine
 class AssetRepository(object):
     def get_asset_with_logical_path(self, logical_path):
         _, ext = os.path.splitext(logical_path)
-        ext = ext.lstrip('.').lower()
-        if ext == 'js':
+        if ext.lower() == '.js':
             return registry_instance.asset_factory.create_js_asset_with_logical_path(logical_path)
-        elif ext == 'css':
+        elif ext.lower() == '.css':
             return registry_instance.asset_factory.create_css_asset_with_logical_path(logical_path)
         else:
             return registry_instance.asset_factory.crete_generic_asset_with_logical_path(logical_path)

@@ -24,6 +24,21 @@ class SRStaticfilesStorage(SRMixin, StaticFilesStorage):
 class SRCachedStaticfilesStorage(SRMixin, CachedFilesMixin, StaticFilesStorage):
     pass
 
+class SRCompressedCachedStaticfilesStorage(SRMixin, CachedFilesMixin, StaticFilesStorage):
+    def get_compressed_name(self, name):
+        name_root, ext = os.path.splitext(name)
+        if ext.lower() == '.js' or ext.lower() == '.css':
+            return "%s.min%s" % (name_root, ext)
+        else:
+            return name
+
+    def url(self, name, force=False):
+        if not settings.DEBUG or force:
+            compressed_name = self.get_compressed_name(name)
+            if self.exists(compressed_name):
+                name = compressed_name
+        return super(SRCompressedCachedStaticfilesStorage, self).url(name, force)
+
 class SRCollectstaticStorageMixin(object):
     prefix = None
 
@@ -76,10 +91,9 @@ class SRCompressCollectstaticStorage(SRCollectstaticStorageMixin, FileSystemStor
         for name in sorted(paths.keys(), key=path_level, reverse=True):
             new_paths[name] = paths[name]
             name_root, ext = os.path.splitext(name)
-            ext = ext.lstrip('.').lower()
-            if ext == 'js' or ext == 'css':
-                target_name = "%s.min.%s" % (name_root, ext)
-                if ext == 'js':
+            if ext.lower() == '.js' or ext.lower() == '.css':
+                target_name = "%s.min%s" % (name_root, ext)
+                if ext == '.js':
                     self.compress_js_file(name, target_name)
                 else:
                     self.compress_css_file(name, target_name)
