@@ -1,9 +1,10 @@
+# coding: utf-8
+
 from __future__ import unicode_literals
 
 import os
 
 from django.contrib.staticfiles import finders
-from django.conf import settings
 
 class FinderService(object):
     def check_existance(self, logical_path):
@@ -20,7 +21,7 @@ class FinderService(object):
 
     def get_lines_from_asset(self, asset):
         with self.open_asset(asset) as f:
-            lines = [line.decode(settings.FILE_CHARSET) for line in f]
+            lines = list(f)
         return lines
 
     def open_asset(self, asset):

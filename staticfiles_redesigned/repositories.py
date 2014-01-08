@@ -2,6 +2,7 @@ import os
 
 from staticfiles_redesigned.registry import registry_instance
 from staticfiles_redesigned.models.assets import AssetLine
+from staticfiles_redesigned.conf import settings
 
 class AssetRepository(object):
     def get_asset_with_logical_path(self, logical_path):
@@ -41,21 +42,27 @@ class AssetInterpreter(object):
         self.multi_line_comment_opened = False
         self.manifest_ended = False
 
+    def get_stripped_unicode_line(self, line):
+        try:
+            return line.strip().decode(settings.FILE_CHARSET)
+        except:
+            return False
+
     def is_line_multi_line_directive(self, line):
-        stripped_line = line.strip()
-        return self.multiple_line_comment_directive_mark and stripped_line.startswith(self.multiple_line_comment_directive_mark)
+        stripped_line = self.get_stripped_unicode_line(line)
+        return stripped_line and self.multiple_line_comment_directive_mark and stripped_line.startswith(self.multiple_line_comment_directive_mark)
 
     def is_line_closing_multi_line_comment(self, line):
-        stripped_line = line.strip()
-        return self.multiple_line_comment_close_mark and stripped_line.endswith(self.multiple_line_comment_close_mark)
+        stripped_line = self.get_stripped_unicode_line(line)
+        return stripped_line and self.multiple_line_comment_close_mark and stripped_line.endswith(self.multiple_line_comment_close_mark)
 
     def is_line_opening_multi_line_comment(self, line):
-        stripped_line = line.strip()
-        return self.multiple_line_comment_open_mark and stripped_line.startswith(self.multiple_line_comment_open_mark)
+        stripped_line = self.get_stripped_unicode_line(line)
+        return stripped_line and self.multiple_line_comment_open_mark and stripped_line.startswith(self.multiple_line_comment_open_mark)
 
     def is_line_single_line_directive(self, line):
-        stripped_line = line.strip()
-        return self.single_line_comment_directive_mark and stripped_line.startswith(self.single_line_comment_directive_mark)
+        stripped_line = self.get_stripped_unicode_line(line)
+        return stripped_line and self.single_line_comment_directive_mark and stripped_line.startswith(self.single_line_comment_directive_mark)
 
     def interpret_directive_line(self, line):
         splitted_line = line.split()

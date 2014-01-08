@@ -4,7 +4,7 @@ import os
 
 from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage, staticfiles_storage
 from django.core.files.storage import FileSystemStorage
-from django.utils.module_loading import import_by_path
+from django.core.files.storage import get_storage_class
 from django.utils.datastructures import SortedDict
 from django.utils.functional import SimpleLazyObject
 
@@ -104,4 +104,4 @@ class SRCompressCollectstaticStorage(SRCollectstaticStorageMixin, FileSystemStor
         paths = self.compress_files(paths, dry_run)
         return super(SRCompressCollectstaticStorage, self).post_process(paths, dry_run, **options)
 
-collectstatic_storage = SimpleLazyObject(lambda: import_by_path(settings.SR_COLLECTSTATIC_STORAGE)())
+collectstatic_storage = SimpleLazyObject(lambda: get_storage_class(settings.SR_COLLECTSTATIC_STORAGE)())
