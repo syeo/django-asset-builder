@@ -84,18 +84,13 @@ class AssetLineRepository(object):
     def get_lines_from_asset(self, asset):
         lines = registry_instance.finder_service.get_lines_from_asset(asset)
         asset_manifest_interpreter = AssetInterpreter(*asset.comment_syntax)
-        for line in lines:
-            yield asset_manifest_interpreter.interpret_line(line)
+        return [asset_manifest_interpreter.interpret_line(line) for line in lines]
 
     def get_content_lines_from_asset(self, asset):
-        for asset_source_line in self.get_lines_from_asset(asset):
-            if not asset_source_line.is_directive:
-                yield asset_source_line
+        return [asset_source_line for asset_source_line in self.get_lines_from_asset(asset) if not asset_source_line.is_directive]
 
     def get_directive_lines_from_asset(self, asset):
-        for asset_source_line in self.get_lines_from_asset(asset):
-            if asset_source_line.is_directive:
-                yield asset_source_line
+        return [asset_source_line for asset_source_line in self.get_lines_from_asset(asset) if asset_source_line.is_directive]
 
 class CachedAssetLineRepository(AssetLineRepository):
     def __init__(self):

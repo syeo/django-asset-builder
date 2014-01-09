@@ -9,16 +9,13 @@ class AssetManifest(object):
         self.content_lines = []
 
     def get_urls(self):
-        for asset in self.assets:
-            yield staticfiles_storage.url(asset.logical_path)
+        return [staticfiles_storage.url(asset.logical_path) for asset in self.assets]
 
     def get_content_lines(self):
-        for content_line in self.content_lines:
-            yield content_line
+        return self.content_lines
 
     def get_assets(self):
-        for asset in self.assets:
-            yield asset
+        return self.assets
 
     def clear(self):
         self.assets = []
