@@ -29,3 +29,9 @@ class FinderService(object):
         prefix = getattr(storage, 'prefix') or ''
         path = os.path.relpath(asset.logical_path, prefix)
         return storage.open(path)
+
+    def get_modified_time_from_logical_path(self, logical_path):
+        storage = self.find_storage_with_path(logical_path)
+        prefix = getattr(storage, 'prefix') or ''
+        path = os.path.relpath(logical_path, prefix)
+        return storage.modified_time(path)

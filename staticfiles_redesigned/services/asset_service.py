@@ -19,11 +19,11 @@ class AssetService(object):
                 ret.write(force_bytes("\n"))
             return ret
 
-class DebugAssetService(AssetService):
+class UnprocessedAssetService(AssetService):
     def get_urls(self, asset):
         asset_manifest = registry_instance.asset_manifest_repository.get_asset_manifest_with_asset(asset)
         return asset_manifest.get_urls()
 
-class ReleaseAssetService(AssetService):
+class ProcessedAssetService(AssetService):
     def get_urls(self, asset):
         return [staticfiles_storage.url(asset.logical_path, True)]

@@ -41,7 +41,7 @@ class AssetManifestContext(object):
 class AssetManifestProcessor(object):
     @staticmethod
     def get_new_asset_with_relative_path(asset, relative_path):
-        new_logical_path = os.path.join(os.path.dirname(asset.logical_path), relative_path) + "." + asset.ext
+        new_logical_path = os.path.normpath(os.path.join(os.path.dirname(asset.logical_path), relative_path) + "." + asset.ext)
         return registry_instance.asset_repository.get_asset_with_logical_path(new_logical_path)
 
     @staticmethod

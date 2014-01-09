@@ -1,22 +1,6 @@
-import os
-
+from staticfiles_redesigned.conf import settings
 from staticfiles_redesigned.registry import registry_instance
 from staticfiles_redesigned.models.assets import AssetLine
-from staticfiles_redesigned.conf import settings
-
-class AssetRepository(object):
-    def get_asset_with_logical_path(self, logical_path):
-        _, ext = os.path.splitext(logical_path)
-        if ext.lower() == '.js':
-            return registry_instance.asset_factory.create_js_asset_with_logical_path(logical_path)
-        elif ext.lower() == '.css':
-            return registry_instance.asset_factory.create_css_asset_with_logical_path(logical_path)
-        else:
-            return registry_instance.asset_factory.crete_generic_asset_with_logical_path(logical_path)
-
-class AssetManifestRepository(object):
-    def get_asset_manifest_with_asset(self, asset):
-        return registry_instance.asset_manifest_factory.create_asset_manifest_with_asset(asset)
 
 class AssetInterpreter(object):
     def __init__(self, single_line_comment_mark, has_mutiple_line_comment):
@@ -112,3 +96,12 @@ class AssetLineRepository(object):
         for asset_source_line in self.get_lines_from_asset(asset):
             if asset_source_line.is_directive:
                 yield asset_source_line
+
+class CachedAssetLineRepository(AssetLineRepository):
+    def __init__(self):
+        self.cached_lines = {}
+
+    def get_lines_from_asset(self, asset):
+        if not self.cached_lines.has_key(asset):
+            self.cached_lines[asset] = super(CachedAssetLineRepository, self).get_lines_from_asset(asset)
+        return self.cached_lines[asset]

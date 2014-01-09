@@ -65,10 +65,10 @@ class SRCollectstaticStorageMixin(object):
                 new_paths[name] = (self, name)
         return new_paths
 
-class SRCollectstaticStorage(SRCollectstaticStorageMixin, FileSystemStorage):
+class SRCollectstaticStorage(SRMixin, SRCollectstaticStorageMixin, FileSystemStorage):
     pass
 
-class SRCompressCollectstaticStorage(SRCollectstaticStorageMixin, FileSystemStorage):
+class SRCompressCollectstaticStorage(SRMixin, SRCollectstaticStorageMixin, FileSystemStorage):
     def execute_command(self, command):
         import subprocess
         pipe = subprocess.Popen(command, shell=True,

@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+import calendar
+
+from staticfiles_redesigned.registry import registry_instance
 
 class Asset(object):
     def __init__(self, logical_path):
@@ -9,17 +12,19 @@ class Asset(object):
         _, ext = os.path.splitext(logical_path)
         self.ext = ext.lstrip('.').lower()
         self.dir = os.path.dirname(logical_path)
+        self.modified_time = registry_instance.finder_service.get_modified_time_from_logical_path(logical_path)
+        self.key = "%s:%d" % (self.logical_path, calendar.timegm(self.modified_time.utctimetuple()))
 
     def __hash__(self):
-        return hash(self.logical_path)
+        return hash(self.key)
 
     def __eq__(self, obj):
-        return type(self) == type(obj) and self.logical_path == obj.logical_path
+        return type(self) == type(obj) and self.key == obj.key
 
     def __cmp__(self, obj):
-        if self.logical_path > obj.logical_path:
+        if self.key > obj.key:
             return 1
-        elif self.logical_path < obj.logical_path:
+        elif self.key < obj.key:
             return -1
         else:
             return 0

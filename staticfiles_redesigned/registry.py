@@ -2,38 +2,32 @@ from django.utils.functional import SimpleLazyObject
 
 from staticfiles_redesigned.conf import settings
 
-class BaseRegistry(object):
+class Registry(object):
     def __init__(self):
         from staticfiles_redesigned.factories.asset_factory import AssetFactory
         self.asset_factory = AssetFactory()
-        from staticfiles_redesigned.repositories import AssetRepository
+        from staticfiles_redesigned.repositories.asset_repository import AssetRepository
         self.asset_repository = AssetRepository()
         from staticfiles_redesigned.services.asset_manifest_service import AssetManifestService
         self.asset_manifest_service = AssetManifestService()
-        from staticfiles_redesigned.repositories import AssetManifestRepository
+        from staticfiles_redesigned.repositories.asset_manifest_repository import AssetManifestRepository
         self.asset_manifest_repository = AssetManifestRepository()
         from staticfiles_redesigned.factories.asset_manifest_factory import AssetManifestFactory
         self.asset_manifest_factory = AssetManifestFactory()
         from staticfiles_redesigned.services.finder_service import FinderService
         self.finder_service = FinderService()
-        from staticfiles_redesigned.repositories import AssetLineRepository
-        self.asset_line_repository = AssetLineRepository()
+        from staticfiles_redesigned.repositories.asset_line_repository import CachedAssetLineRepository
+        self.asset_line_repository = CachedAssetLineRepository()
 
-class DebugRegistry(BaseRegistry):
-    def __init__(self):
-        from staticfiles_redesigned.services.asset_service import DebugAssetService
-        self.asset_service = DebugAssetService()
-        super(DebugRegistry, self).__init__()
+        if settings.SR_ENABLED:
+            from staticfiles_redesigned.services.asset_service import ProcessedAssetService
+            self.asset_service = ProcessedAssetService()
+            from staticfiles_redesigned.repositories.asset_manifest_repository import CachedAssetManifestRepository
+            self.asset_manifest_repository = CachedAssetManifestRepository()
+        else:
+            from staticfiles_redesigned.services.asset_service import UnprocessedAssetService
+            self.asset_service = UnprocessedAssetService()
+            from staticfiles_redesigned.repositories.asset_manifest_repository import AssetManifestRepository
+            self.asset_manifest_repository = AssetManifestRepository()
 
-class ReleaseRegistry(BaseRegistry):
-    def __init__(self):
-        from staticfiles_redesigned.services.asset_service import ReleaseAssetService
-        self.asset_service = ReleaseAssetService()
-        super(ReleaseRegistry, self).__init__()
-
-if settings.SR_ENABLED:
-    registry_class = ReleaseRegistry
-else:
-    registry_class = DebugRegistry
-
-registry_instance = SimpleLazyObject(lambda: registry_class())
+registry_instance = SimpleLazyObject(lambda: Registry())
